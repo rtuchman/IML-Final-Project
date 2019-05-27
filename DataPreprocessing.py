@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 from feature_selector import FeatureSelector
 import warnings
 warnings.filterwarnings('ignore')
+from sklearn.model_selection import KFold
 
 
 class PreprocessingPipeline():
@@ -72,6 +74,18 @@ class PreprocessingPipeline():
             self._df_train = self._df_train.drop(columns=categorical_indices)
         return
 
+    def feature_scaling(self):
+        """First we fit the train set and than the test set
+           this way they are fit on the same scale and also the test data isn't leaking
+        """
+        sc_train = StandardScaler()
+        self._df_train.iloc[:, :-1] = sc_train.fit_transform(self._df_train.iloc[:, :-1])
+        self._df_test = sc_train.transform(self._df_test)
+
+
+
+
+
 
 if __name__ == '__main__':
     dp = PreprocessingPipeline(train='train.csv', test='test_without_target.csv')
@@ -81,4 +95,5 @@ if __name__ == '__main__':
     dp.handle_unknown_features(test=True)
     dp.encode_categorical()
     dp.encode_categorical(test=True)
+    dp.feature_scaling()
 
