@@ -587,7 +587,7 @@ class FeatureSelector():
         ax.set_xticklabels(list(corr_matrix_plot.columns), size = int(160 / corr_matrix_plot.shape[1]));
         plt.title(title, size = 14)
         
-    def plot_feature_importances(self, plot_n = 15, threshold = None):
+    def plot_feature_importances(self, plot_n = 15, threshold = None, fig_size = (6, 5)):
         """
         Plots `plot_n` most important features and the cumulative importance of features.
         If `threshold` is provided, prints the number of features needed to reach `threshold` cumulative importance.
@@ -613,7 +613,7 @@ class FeatureSelector():
         self.reset_plot()
         
         # Make a horizontal bar chart of feature importances
-        plt.figure(figsize = (10, 6))
+        plt.figure(figsize = fig_size)
         ax = plt.subplot()
 
         # Need to reverse the index to plot most important on top
