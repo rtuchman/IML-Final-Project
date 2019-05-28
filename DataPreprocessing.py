@@ -1,17 +1,17 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from scipy import stats
 from feature_selector import FeatureSelector
 import warnings
 warnings.filterwarnings('ignore')
-from sklearn.model_selection import KFold
 
 
 class PreprocessingPipeline():
 
     def __init__(self, train, test):
         self._df_train = pd.read_csv(train)
-        self._df_test = pd.read_csv(test)
+        self._df_test = pd.read_csv(test).iloc[:, 1:]  # throw away redundant index column
 
     def handle_missing_data(self, test=False):
         """Impute missing values.
@@ -38,7 +38,6 @@ class PreprocessingPipeline():
             self._df_train.fillna(self._fill_na_train_dict, inplace=True)
 
 
-
     def handle_unknown_features(self, test=False):
         """Nullify samples in which df[3] == 'unknown'
         """
@@ -48,6 +47,11 @@ class PreprocessingPipeline():
             self._df_train['3'].replace('unknown', np.NaN, inplace=True)
 
 
+    def remove_outliers_from_train(self):
+        #first find numerical cols
+        cols = self._df_train.columns
+        num_cols = list(self._df_train._get_numeric_data().columns)[:-1]  # drop label
+        self._df_train = self._df_train[(np.abs(stats.zscore(self._df_train.loc[:, num_cols])) < 3).all(axis=1)]
 
     def encode_categorical(self, test=False):
         if test:
@@ -78,9 +82,11 @@ class PreprocessingPipeline():
         """First we fit the train set and than the test set
            this way they are fit on the same scale and also the test data isn't leaking
         """
-        sc_train = StandardScaler()
-        self._df_train.iloc[:, :-1] = sc_train.fit_transform(self._df_train.iloc[:, :-1])
-        self._df_test = sc_train.transform(self._df_test)
+        self.sc = StandardScaler()
+        self._df_train.iloc[:, :-1] = self.sc.fit_transform(self._df_train.iloc[:, :-1])
+        self._df_test = self.sc.transform(self._df_test)
+
+        print('dudu')
 
 
 
@@ -93,6 +99,7 @@ if __name__ == '__main__':
     dp.handle_missing_data(test=True)
     dp.handle_unknown_features()
     dp.handle_unknown_features(test=True)
+    dp.remove_outliers_from_train()
     dp.encode_categorical()
     dp.encode_categorical(test=True)
     dp.feature_scaling()
