@@ -43,8 +43,11 @@ class PreprocessingPipeline():
         """
         if test:
             self._df_test['3'].replace('unknown', np.NaN, inplace=True)
+            self._df_test['8'].replace('?', np.NaN, inplace=True)
         else:
             self._df_train['3'].replace('unknown', np.NaN, inplace=True)
+            self._df_train['8'].replace('?', np.NaN, inplace=True)
+
 
 
     def remove_outliers_from_train(self):
@@ -61,34 +64,32 @@ class PreprocessingPipeline():
             categorical_indices = list(set(cols) - set(num_cols))
 
             # create dummis
-            dummies_list = [pd.get_dummies(self._df_test[idx], prefix='f{}'.format(idx)) for idx in categorical_indices]
+            dummies_list = [pd.get_dummies(self._df_test[idx], prefix='{}'.format(idx)) for idx in categorical_indices]
             frames = dummies_list + [self._df_test]
             self._df_test = pd.concat(frames, axis=1)
             self._df_test = self._df_test.drop(columns=categorical_indices)
         else:
-            # find categorial colimns
+            # find categorial columns
             cols = self._df_train.columns
             num_cols = self._df_train._get_numeric_data().columns
             categorical_indices = list(set(cols) - set(num_cols))
 
             # create dummis
-            dummies_list = [pd.get_dummies(self._df_train[idx], prefix='f{}'.format(idx)) for idx in categorical_indices]
+            dummies_list = [pd.get_dummies(self._df_train[idx], prefix='{}'.format(idx)) for idx in categorical_indices]
             frames = dummies_list + [self._df_train]
             self._df_train = pd.concat(frames, axis=1)
             self._df_train = self._df_train.drop(columns=categorical_indices)
         return
 
-    def feature_scaling(self):
+    def feature_scaling(self, test=False):
         """First we fit the train set and than the test set
            this way they are fit on the same scale and also the test data isn't leaking
         """
-        self.sc = StandardScaler()
-        self._df_train.iloc[:, :-1] = self.sc.fit_transform(self._df_train.iloc[:, :-1])
-        self._df_test = self.sc.transform(self._df_test)
-
-        print('dudu')
-
-
+        if not test:
+            self.sc = StandardScaler()
+            self._df_train.iloc[:, :-1] = self.sc.fit_transform(self._df_train.iloc[:, :-1])
+        else:
+            self._df_test.iloc[:, :] = self.sc.transform(self._df_test)
 
 
 
@@ -103,4 +104,4 @@ if __name__ == '__main__':
     dp.encode_categorical()
     dp.encode_categorical(test=True)
     dp.feature_scaling()
-
+    dp.feature_scaling(test=True)
