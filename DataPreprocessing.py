@@ -92,16 +92,3 @@ class PreprocessingPipeline():
             self._df_test.iloc[:, :] = self.sc.transform(self._df_test)
 
 
-
-
-if __name__ == '__main__':
-    dp = PreprocessingPipeline(train='train.csv', test='test_without_target.csv')
-    dp.handle_missing_data()
-    dp.handle_missing_data(test=True)
-    dp.handle_unknown_features()
-    dp.handle_unknown_features(test=True)
-    dp.remove_outliers_from_train()
-    dp.encode_categorical()
-    dp.encode_categorical(test=True)
-    dp.feature_scaling()
-    dp.feature_scaling(test=True)
