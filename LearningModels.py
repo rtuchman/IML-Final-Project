@@ -25,13 +25,15 @@ class RunModels():
             self.input_dim = X.shape[1]
 
 
-    def ANN(self, layers=(50, 50), weights_init='glorot-uniform', activation='relu', drop_amount=(0.05, 0.25),
-            adam_lr=0.001, adam_beta_1=0.9, adam_beta_2=0.999):
+    def ANN(self, layers=(20, 20), weights_init='glorot-uniform', activation='relu',
+            drop_amount=0.25, adam_lr=0.001, adam_beta_1=0.9, adam_beta_2=0.999,
+            sgd_lr=0.01, sgd_decay=1e-6, sgd_momentum=0.9, nesterov=True):
+
         # Initialising the ANN
         classifier = Sequential()
 
         # Adding the input layer and the first hidden layer
-        classifier.add(Dropout(drop_amount[0]))
+        classifier.add(Dropout(drop_amount))
         classifier.add(Dense(input_dim=self.input_dim, units=layers[0],
                                   kernel_initializer=weights_init, activation=activation))
 
@@ -44,8 +46,10 @@ class RunModels():
         classifier.add(Dense(units=2, kernel_initializer=weights_init, activation='softmax'))
 
         # Compiling the ANN
+        sgd = optimizers.SGD(lr=sgd_lr, decay=sgd_decay, momentum=sgd_momentum, nesterov=nesterov)  # slower but generalizes better
         adam = optimizers.Adam(lr=adam_lr, beta_1=adam_beta_1, beta_2=adam_beta_2)  # faster
-        classifier.compile(optimizer=adam, loss='binary_crossentropy', metrics=['binary_accuracy'])
+        optimizers_list = [sgd, adam]
+        classifier.compile(optimizer=optimizers_list[1], loss='binary_crossentropy', metrics=['binary_accuracy'])
 
         return classifier
 
