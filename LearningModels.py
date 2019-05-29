@@ -24,22 +24,6 @@ class RunModels():
                                                                                                 random_state=0)
             self.input_dim = X.shape[1]
 
-#    def NaiveBayes(self):
-#        return GaussianNB()
-#
-#
-#    def KNN(self, n_neighbors=5, metric='minkowski', p=2):
-#        return KNeighborsClassifier(n_neighbors=n_neighbors, metric=metric, p=p)
-#
-#
-#    def LogisticRegression(self):
-#        return LogisticRegression(random_state=0)
-#
-#    def DesicionTree(self):
-#        return DecisionTreeClassifier(criterion='entropy', random_state=0)
-#
-#    def SVM(self, C=1000.0, kernel='linear'):
-#        return SVC(C=C, kernel=kernel, random_state=0)
 
     def ANN(self, layers=(50, 50), weights_init='glorot-uniform', activation='relu', drop_amount=(0.05, 0.25),
             adam_lr=0.001, adam_beta_1=0.9, adam_beta_2=0.999):
