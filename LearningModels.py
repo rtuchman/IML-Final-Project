@@ -25,7 +25,7 @@ class RunModels():
             self.input_dim = X.shape[1]
 
 
-    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.25):
+    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.25, optimizer='adam'):
 
         # Initialising the ANN
         classifier = Sequential()
@@ -47,7 +47,7 @@ class RunModels():
         #sgd = optimizers.SGD(lr=sgd_lr, decay=sgd_decay, momentum=sgd_momentum, nesterov=nesterov)  # slower but generalizes better
         #adam = optimizers.Adam(lr=adam_lr, beta_1=adam_beta_1, beta_2=adam_beta_2)  # faster
         #optimizers_list = [sgd, adam]
-        classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['binary_accuracy'])
+        classifier.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['binary_accuracy'])
 
         return classifier
 
