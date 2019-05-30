@@ -25,39 +25,36 @@ class RunModels():
             self.input_dim = X.shape[1]
 
 
-    def ANN(self, layers=(20, 20), weights_init='glorot-uniform', activation='relu',
-            drop_amount=0.25, adam_lr=0.001, adam_beta_1=0.9, adam_beta_2=0.999,
-            sgd_lr=0.01, sgd_decay=1e-6, sgd_momentum=0.9, nesterov=True):
+    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.25):
 
         # Initialising the ANN
         classifier = Sequential()
 
         # Adding the input layer and the first hidden layer
-        classifier.add(Dropout(drop_amount))
+        classifier.add(Dropout(rate=dropout_rate))
         classifier.add(Dense(input_dim=self.input_dim, units=layers[0],
                                   kernel_initializer=weights_init, activation=activation))
 
         # Adding the hidden layers
-        for l in layers[1:]:
-            classifier.add(Dropout(drop_amount[1]))
-            classifier.add(Dense(units=layers[l], kernel_initializer=weights_init, activation=activation))
+        for neurons in layers[1:]:
+            classifier.add(Dropout(rate=dropout_rate))
+            classifier.add(Dense(units=neurons, kernel_initializer=weights_init, activation=activation))
 
         # Adding the output layer
-        classifier.add(Dense(units=2, kernel_initializer=weights_init, activation='softmax'))
+        classifier.add(Dense(units=1, kernel_initializer=weights_init, activation='sigmoid'))
 
         # Compiling the ANN
-        sgd = optimizers.SGD(lr=sgd_lr, decay=sgd_decay, momentum=sgd_momentum, nesterov=nesterov)  # slower but generalizes better
-        adam = optimizers.Adam(lr=adam_lr, beta_1=adam_beta_1, beta_2=adam_beta_2)  # faster
-        optimizers_list = [sgd, adam]
-        classifier.compile(optimizer=optimizers_list[1], loss='binary_crossentropy', metrics=['binary_accuracy'])
+        #sgd = optimizers.SGD(lr=sgd_lr, decay=sgd_decay, momentum=sgd_momentum, nesterov=nesterov)  # slower but generalizes better
+        #adam = optimizers.Adam(lr=adam_lr, beta_1=adam_beta_1, beta_2=adam_beta_2)  # faster
+        #optimizers_list = [sgd, adam]
+        classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['binary_accuracy'])
 
         return classifier
 
     def create_confusion_matrix(self, y, y_pred):
 
         # Making the Confusion Matrix
-        y_predict_non_category = [np.argmax(t) for t in y_pred]
-        self.cm = confusion_matrix(y, y_predict_non_category)
+        self.cm = confusion_matrix(y, y_pred)
 
     def plot_confusion_matrix(self, title='Confusion matrix', cmap=None, normalize=True):
 
@@ -99,13 +96,18 @@ class RunModels():
         plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
 
 if __name__ == '__main__':
+    from sklearn.svm import SVC
     low_dim_processed_train = pd.read_csv('low_dim_processed_train')
-    LM_1 = LearningModels(dataset=low_dim_processed_train)
-    NB_clf = LM_1.NaiveBayes()
-    NB_clf.fit(LM_1.X_train, LM_1.y_train)
-    y_pred = NB_clf.predict_proba(LM_1.X_validation)
-    LM_1.create_confusion_matrix(LM_1.y_validation, y_pred)
-    LM_1.plot_confusion_matrix()
+    RM = RunModels(dataset=low_dim_processed_train)
+    X_train, y_train, X_validation, y_validation = RM.X_train, RM.y_train, RM.X_validation, RM.y_validation
+    svm = SVC(C=100, gamma=1, kernel='rbf')
+    svm.fit(X_train, y_train)
+    svm_y_pred = svm.predict(X_validation)
+    RM.create_confusion_matrix(RM.y_validation, svm_y_pred)
+    RM.plot_confusion_matrix()
+
+    print('hello')
+
 
 
 
