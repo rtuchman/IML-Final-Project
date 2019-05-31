@@ -25,29 +25,28 @@ class RunModels():
             self.input_dim = X.shape[1]
 
 
-    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.25, optimizer='adam'):
+    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.1,
+            optimizer='adam',  lr=0.00095, beta_1=0.9299, beta_2=0.995):
 
         # Initialising the ANN
         classifier = Sequential()
 
         # Adding the input layer and the first hidden layer
-        classifier.add(Dropout(rate=dropout_rate))
+        classifier.add(Dropout(dropout_rate))
         classifier.add(Dense(input_dim=self.input_dim, units=layers[0],
                                   kernel_initializer=weights_init, activation=activation))
 
         # Adding the hidden layers
         for neurons in layers[1:]:
-            classifier.add(Dropout(rate=dropout_rate))
+            classifier.add(Dropout(dropout_rate))
             classifier.add(Dense(units=neurons, kernel_initializer=weights_init, activation=activation))
 
         # Adding the output layer
         classifier.add(Dense(units=1, kernel_initializer=weights_init, activation='sigmoid'))
 
         # Compiling the ANN
-        #sgd = optimizers.SGD(lr=sgd_lr, decay=sgd_decay, momentum=sgd_momentum, nesterov=nesterov)  # slower but generalizes better
-        #adam = optimizers.Adam(lr=adam_lr, beta_1=adam_beta_1, beta_2=adam_beta_2)  # faster
-        #optimizers_list = [sgd, adam]
-        classifier.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['binary_accuracy'])
+        adam = optimizers.Adam(lr=lr, beta_1=beta_1, beta_2=beta_2)
+        classifier.compile(optimizer=adam, loss='binary_crossentropy', metrics=['binary_accuracy'])
 
         return classifier
 
@@ -94,19 +93,6 @@ class RunModels():
         plt.gcf().subplots_adjust(bottom=0.3)
         plt.ylabel('True label')
         plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
-
-if __name__ == '__main__':
-    from sklearn.svm import SVC
-    low_dim_processed_train = pd.read_csv('low_dim_processed_train')
-    RM = RunModels(dataset=low_dim_processed_train)
-    X_train, y_train, X_validation, y_validation = RM.X_train, RM.y_train, RM.X_validation, RM.y_validation
-    svm = SVC(C=100, gamma=1, kernel='rbf')
-    svm.fit(X_train, y_train)
-    svm_y_pred = svm.predict(X_validation)
-    RM.create_confusion_matrix(RM.y_validation, svm_y_pred)
-    RM.plot_confusion_matrix()
-
-    print('hello')
 
 
 
