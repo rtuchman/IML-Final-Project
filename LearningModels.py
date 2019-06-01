@@ -13,42 +13,16 @@ import pandas as pd
 
 
 
-class RunModels():
+class RunUtils():
 
     def __init__(self, dataset):
 
-            X = dataset.iloc[:, 1:-1].values
+            X = dataset.iloc[:, :-1].values
             y = dataset.iloc[:, -1].values
             self.X_train, self.X_validation, self.y_train, self.y_validation = train_test_split(X, y,
-                                                                                                test_size=0.25,
+                                                                                                test_size=0.2,
                                                                                                 random_state=0)
-            self.input_dim = X.shape[1]
 
-
-    def ANN(self, layers=(50, 50, 50), weights_init='glorot_uniform', activation='relu', dropout_rate=0.1,
-            optimizer='adam',  lr=0.00095, beta_1=0.9299, beta_2=0.995):
-
-        # Initialising the ANN
-        classifier = Sequential()
-
-        # Adding the input layer and the first hidden layer
-        classifier.add(Dropout(dropout_rate))
-        classifier.add(Dense(input_dim=self.input_dim, units=layers[0],
-                                  kernel_initializer=weights_init, activation=activation))
-
-        # Adding the hidden layers
-        for neurons in layers[1:]:
-            classifier.add(Dropout(dropout_rate))
-            classifier.add(Dense(units=neurons, kernel_initializer=weights_init, activation=activation))
-
-        # Adding the output layer
-        classifier.add(Dense(units=1, kernel_initializer=weights_init, activation='sigmoid'))
-
-        # Compiling the ANN
-        adam = optimizers.Adam(lr=lr, beta_1=beta_1, beta_2=beta_2)
-        classifier.compile(optimizer=adam, loss='binary_crossentropy', metrics=['binary_accuracy'])
-
-        return classifier
 
     def create_confusion_matrix(self, y, y_pred):
 
@@ -94,8 +68,27 @@ class RunModels():
         plt.ylabel('True label')
         plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
 
-
-
+	def view_graphs(history):
+		epochs = history.epoch
+		plt.plot(epochs, history.history['val_acc'], label='val_acc')
+		plt.plot(epochs, history.history['acc'], label='train_acc')
+		plt.legend()
+		plt.xlabel('epochs')
+		plt.ylabel('Accuracy')
+		plt.title('Validation Accuracy={0:.4f}\nTraining Accuracy={1:.4f}'.format(history.history['val_acc'][-1],
+																				history.history['acc'][-1]))
+		plt.show()
+		plt.close()
+	
+		plt.plot(epochs, history.history['val_loss'], label='val_loss')
+		plt.plot(epochs, history.history['loss'], label='train_loss')
+		plt.legend()
+		plt.xlabel('epochs')
+		plt.ylabel('Loss')
+		plt.title('Validation Loss={0:.4f}\nTraining Loss={1:.4f}'.format(history.history['val_loss'][-1],
+																		history.history['loss'][-1]))
+		plt.show()
+		plt.close()
 
 
 
