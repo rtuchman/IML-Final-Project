@@ -3,11 +3,9 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 from scipy import stats
 from feature_selector import FeatureSelector
-import warnings
-warnings.filterwarnings('ignore')
 
 
-class PreprocessingPipeline():
+class DataPreprocessing():
 
     def __init__(self, train, test):
         self._df_train = pd.read_csv(train)
