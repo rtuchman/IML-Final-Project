@@ -65,30 +65,31 @@ class RunUtils():
 
         plt.tight_layout()
         plt.gcf().subplots_adjust(bottom=0.3)
-        plt.ylabel('True label')
+        plt.ylabel('True label')        
         plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
+        
+        
 
-	def view_graphs(history):
-		epochs = history.epoch
-		plt.plot(epochs, history.history['val_acc'], label='val_acc')
-		plt.plot(epochs, history.history['acc'], label='train_acc')
-		plt.legend()
-		plt.xlabel('epochs')
-		plt.ylabel('Accuracy')
-		plt.title('Validation Accuracy={0:.4f}\nTraining Accuracy={1:.4f}'.format(history.history['val_acc'][-1],
+    def view_graphs(self, history):
+        epochs = history.epoch
+        plt.plot(epochs, history.history['val_acc'], label='val_acc')
+        plt.plot(epochs, history.history['acc'], label='train_acc')
+        plt.legend()
+        plt.xlabel('epochs')
+        plt.ylabel('Accuracy')
+        plt.title('Validation Accuracy={0:.4f}\nTraining Accuracy={1:.4f}'.format(history.history['val_acc'][-1],
 																				history.history['acc'][-1]))
-		plt.show()
-		plt.close()
-	
-		plt.plot(epochs, history.history['val_loss'], label='val_loss')
-		plt.plot(epochs, history.history['loss'], label='train_loss')
-		plt.legend()
-		plt.xlabel('epochs')
-		plt.ylabel('Loss')
-		plt.title('Validation Loss={0:.4f}\nTraining Loss={1:.4f}'.format(history.history['val_loss'][-1],
+        plt.show()
+        plt.close()
+        plt.plot(epochs, history.history['val_loss'], label='val_loss')
+        plt.plot(epochs, history.history['loss'], label='train_loss')
+        plt.legend()
+        plt.xlabel('epochs')
+        plt.ylabel('Loss')
+        plt.title('Validation Loss={0:.4f}\nTraining Loss={1:.4f}'.format(history.history['val_loss'][-1],
 																		history.history['loss'][-1]))
-		plt.show()
-		plt.close()
+        plt.show()
+        plt.close()
 
 
 
